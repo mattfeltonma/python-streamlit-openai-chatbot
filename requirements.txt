@@ -1,0 +1,7 @@
+streamlit>=1.28
+openai>=1.2
+streamlit-feedback
+azure-identity>=1.12.0
+pillow>=10.4.0
+python-dotenv
+asyncio

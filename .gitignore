@@ -1,0 +1,9 @@
+# Standard Python stuff
+.venv
+venv
+__pycache__
+
+# App specific
+.sp1_secret
+.sp2_secret
+.variables

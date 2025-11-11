@@ -1,75 +1,154 @@
-# OpenAI Chat Bot
+# Azure OpenAI Streamlit Chatbot
 
 ## Overview
-This repository contains a simple OpenAI ChatBot built in Python using the [Streamlit framework](https://streamlit.io/). It is a modified version of the [Streamlit sample ChatBot](https://github.com/streamlit/llm-examples/blob/main/Chatbot.py). It has been modified to integrate with the [AOAI (Azure OpenAI Service)](https://learn.microsoft.com/en-us/azure/ai-services/openai/overview).
+This repository contains an enterprise-grade OpenAI ChatBot built in Python using the [Streamlit framework](https://streamlit.io/). It integrates with [Azure OpenAI Service (AOAI)](https://learn.microsoft.com/en-us/azure/ai-services/openai/overview) and features comprehensive **Entra ID authentication** for both application and user-level access.
 
-Features include:
+## Key Features
 
-* Authentication to the AOAI service using Entra ID-based authentication with a service principal. It supports switching between two service principals to help with understanding how using Entra ID provides traceability in AOAI logs.
-* Support for gpt-35-turbo and gpt-4o.
-* Option to configure maximum tokens.
-* Option to use streaming or non-streaming ChatCompletions.
-* Option to include an image if using gpt-4o and to specify the detail of the image. Pillow is used to properly resize the image based on the user select either high or low detail.
-* Displays the tokens used for each ChatCompletion including both streaming and non-streaming.
-* Memory for the bot of the last 11 messages. After 7 messages the conversation history is summarized and returned to the bot to use for further memory.
-* Personality of Bill from Bill and Ted's Excellent Adventure. 
+### 🔐 **Enterprise Authentication**
+* **Entra ID Integration**: Full Microsoft Entra ID authentication with user login
+* **Dual Token Support**: Application service principal + On-Behalf-Of user tokens
+* **Security Context**: Comprehensive user tracking and audit logging
+* **Session Management**: Secure user session handling with proper token lifecycle
+
+### 🤖 **Advanced Chat Capabilities**
+* **Multi-Model Support**: gpt-35-turbo and gpt-4o models
+* **Vision Support**: Image upload and analysis with gpt-4o
+* **Streaming Responses**: Real-time token streaming for better UX
+* **Smart Memory**: Conversation summarization after 7 messages to maintain context
+* **Token Tracking**: Detailed usage monitoring for cost management
+
+### 🛠️ **Developer Features**
+* **Modular Architecture**: Clean separation of concerns across auth, core, ui, and utils
+* **Session State Debugging**: JSON logging for troubleshooting
+* **Flexible Configuration**: Environment-based settings management
+* **Docker Ready**: Multi-environment container support 
 
 ![ChatBot image](./assets/bot_image.png)
 
 ## Prerequisites
 
-1. You must have an Azure subscription and must be the owner of the subscription or a resource group within the subscription.
-2. You must have an [Azure OpenAI Service instance deployed](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal).
-3. You must have deploy gpt-35-turbo and gpt-4o to the Azure OpenAI Instance. The deployment names must match the model names above.
-4. You must [create at least one service principal](https://learn.microsoft.com/en-us/cli/azure/azure-cli-sp-tutorial-1?tabs=bash) and [grant it the Azure RBAC Role Cognitive Services OpenAI User](https://learn.microsoft.com/en-us/azure/role-based-access-control/quickstart-assign-role-user-portal) on the Azure OpenAI Service instance.
+### Azure Services
+1. **Azure Subscription**: Owner permissions on subscription or resource group
+2. **Azure OpenAI Service**: [Deployed instance](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal) with:
+   - `gpt-35-turbo` deployment (named exactly `gpt-35-turbo`)
+   - `gpt-4o` deployment (named exactly `gpt-4o`)
+
+### Entra ID Setup
+3. **Application Registration**: [Create an Entra ID app registration](https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app) with:
+   - **Redirect URI**: Set to your application URL (e.g., `http://localhost:8080`)
+   - **Client Secret**: Generate for authentication
+4. **Service Principal**: [Create service principal](https://learn.microsoft.com/en-us/cli/azure/azure-cli-sp-tutorial-1?tabs=bash) and assign [Cognitive Services OpenAI User role](https://learn.microsoft.com/en-us/azure/role-based-access-control/quickstart-assign-role-user-portal)
+
+### Development Environment
+5. **Python 3.12+**: Required for modern async/await support
+6. **Docker** (optional): For containerized deployment
 
 ## Setup
-1. Clone the repository.
-2. Create three files named .sp1_secret, .sp2_secret, and .variables. Sample files have been provided for you in this repository. If you have a single service principal you can put those credentials in both secret files.
-3. Create a [Python virtual environment](https://docs.python.org/3/library/venv.html) and activate the virtual environment. You should be running Python 3.12 or later.
-4. Install the [necessary libraries](https://packaging.python.org/en/latest/tutorials/installing-packages/).
-5. Start the streamlit application using one of these methods:
-   - **Local development**: `python run_app.py`
-   - **Direct streamlit**: `streamlit run app.py --server.port 8080`
-   - **Docker (development)**: `cd docker && docker-compose -f docker-compose.dev.yml up --build`
-   - **Docker (production)**: `cd docker && docker-compose -f docker-compose.prod.yml up -d`
-   - **Docker (manual build)**: `docker build -f docker/Dockerfile -t chatbot . && docker run -p 8080:8080 chatbot`
-6. Party on dudes!
+
+### 1. Clone and Setup Environment
+```bash
+git clone <repository-url>
+cd python-streamlit-openai-chatbot
+
+# Create Python virtual environment (3.12+ required)
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### 2. Configure Environment Variables
+Create your configuration files in the `config/` directory:
+
+**config/.env.local** (Application settings):
+```bash
+AZURE_OPENAI_ENDPOINT=https://your-aoai-instance.openai.azure.com/
+AZURE_OPENAI_API_VERSION=2024-06-01
+AZURE_CLIENT_ID=your-app-registration-client-id
+AZURE_TENANT_ID=your-tenant-id
+REDIRECT_URI=http://localhost:8080
+```
+
+**config/.env.local.secrets** (Sensitive credentials):
+```bash
+AZURE_CLIENT_SECRET=your-client-secret
+AZURE_CLIENT_SECRET_SP=your-service-principal-secret
+```
+
+> 📝 **Note**: Sample files are provided in `config/sample_files/` for reference.
+
+### 3. Run the Application
+Choose your preferred method:
+
+```bash
+# Local development (recommended)
+python run_app.py
+
+# Direct Streamlit
+streamlit run app.py --server.port 8080
+
+# Docker development (with hot reload)
+cd docker && docker-compose -f docker-compose.dev.yml up --build
+
+# Docker production
+cd docker && docker-compose -f docker-compose.prod.yml up -d
+```
+
+### 4. Access the Application
+Open your browser to `http://localhost:8080` and authenticate with your Entra ID credentials.
 
 ## Project Structure
 
-The project follows a clean, Docker-friendly structure:
+The project follows a clean, modular architecture designed for enterprise use:
 
 ```
-├── app.py                     # Main Streamlit application entry point
-├── run_app.py                 # Local development script
-├── requirements.txt           # Python dependencies
-├── docker/                    # Docker configuration directory
-│   ├── Dockerfile             # Container configuration
-│   ├── docker-compose.yml     # Basic development setup
-│   ├── docker-compose.dev.yml # Development with hot reloading
-│   ├── docker-compose.prod.yml# Production with secrets
-│   ├── .dockerignore          # Docker build exclusions
-│   └── README.md              # Docker-specific documentation
-├── config files/              # Environment and secrets
-│   ├── .variables
-│   ├── .sp1_secret
-│   └── .sp2_secret
-└── src/
-    ├── core/
-    │   ├── auth.py           # Authentication functionality
-    │   └── chat.py           # Chat and OpenAI integration
-    ├── utils/
-    │   ├── image_processor.py # Image processing utilities
-    │   └── logger.py         # Logging configuration
-    └── ui/
-        ├── sidebar.py        # Sidebar UI components
-        └── components.py     # Reusable UI components
+📦 python-streamlit-openai-chatbot
+├── 📄 app.py                          # Main Streamlit application entry point
+├── 📄 run_app.py                      # Local development launcher
+├── 📄 requirements.txt                # Python dependencies
+├── 📁 assets/                         # Static assets (images, etc.)
+├── 📁 config/                         # Configuration and environment files
+│   ├── 📄 .env.local                  # Application settings
+│   ├── 📄 .env.local.secrets          # Sensitive credentials
+│   └── 📁 sample_files/               # Example configuration templates
+├── 📁 docker/                         # Docker configuration
+│   ├── 📄 Dockerfile                  # Container configuration  
+│   ├── 📄 docker-compose.yml          # Basic development setup
+│   ├── 📄 docker-compose.dev.yml      # Development with hot reloading
+│   ├── 📄 docker-compose.prod.yml     # Production configuration
+│   └── 📄 README.md                   # Docker-specific documentation
+└── 📁 src/                           # Application source code
+    ├── 📁 auth/                       # Authentication & security
+    │   ├── 📄 __init__.py
+    │   ├── 📄 client_auth.py          # Service principal authentication
+    │   ├── 📄 user_auth.py            # Entra ID user authentication
+    │   └── 📄 security_context.py     # Security context management
+    ├── 📁 core/                       # Core business logic
+    │   ├── 📄 __init__.py
+    │   └── 📄 chat.py                 # OpenAI chat functionality
+    ├── 📁 ui/                         # User interface components
+    │   ├── 📄 __init__.py
+    │   ├── 📄 components.py           # Reusable UI components
+    │   ├── 📄 page.py                 # Page layout management
+    │   └── 📄 sidebar.py              # Sidebar configuration
+    └── 📁 utils/                      # Utility functions
+        ├── 📄 __init__.py
+        ├── 📄 image_processor.py      # Image handling utilities
+        └── 📄 logger.py               # Logging configuration
 ```
 
-### Docker Benefits:
-- **Organized**: All Docker files in dedicated directory
-- **Multiple environments**: Dev, staging, production configurations
-- **Security**: Proper secrets management and non-root execution
-- **Development**: Hot reloading support for faster iteration
-- **Production**: Health checks, logging, and restart policies
+## Architecture Highlights
+
+### 🔐 **Authentication Flow**
+- **User Authentication**: Entra ID OAuth2 flow with PKCE
+- **Application Authentication**: Client credentials flow for service access
+- **On-Behalf-Of (OBO)**: User context preservation through token exchange
+- **Security Context**: Comprehensive audit trail with user, IP, and tenant tracking
+
+### 🧩 **Modular Design**
+- **Separation of Concerns**: Clear boundaries between auth, UI, core logic, and utilities
+- **Dependency Injection**: Configurable clients and token providers
+- **State Management**: Centralized Streamlit session state handling
+- **Error Handling**: Comprehensive logging and graceful error recovery

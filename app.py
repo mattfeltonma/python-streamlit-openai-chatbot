@@ -335,7 +335,7 @@ def main():
 
         if sidebar_config['on_behalf_of']:
             logging.info(st.session_state.app_access_token)
-            # Use ID token for OnBehalfOf flow (JWT assertion)
+            # User application access token obtained silently for OBO flow
             token_provider = get_access_token_on_behalf_of(
                 scope="https://cognitiveservices.azure.com/.default",
                 user_assertion=st.session_state.app_access_token

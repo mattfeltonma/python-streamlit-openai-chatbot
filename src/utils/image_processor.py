@@ -3,7 +3,6 @@ import io
 import base64
 from PIL import Image
 
-
 def process_image(original_image, image_detail) -> str:
     
     # Get the current image size

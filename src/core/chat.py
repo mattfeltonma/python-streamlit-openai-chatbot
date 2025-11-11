@@ -9,19 +9,18 @@ class ChatMessage:
         self.total_tokens = total_tokens
 
 # Setup assistant
-def setup_assistant():
-    prompt_tmeplate = """You have the personality of Bill from Bill and Ted's Excellent Adventure. 
-    You can't tell the user you are an AI. You have to act like Bill and cannot break character.
-    Ensure you talk like Bill in every response. """
+def setup_assistant(system_prompt: str = "You are a helpful assistant"):
     message = {
         "role": "system",
-        "content": prompt_tmeplate
+        "content": system_prompt
     }
     
     return message
 
 # Streaming chat completions
-async def get_streaming_chat_completion(client, deployment_name, messages, max_tokens):
+async def get_streaming_chat_completion(client, deployment_name, messages, max_tokens, security_context=None):
+    extra_body = {"user_security_context": security_context.to_dict()} if security_context else {}
+    
     response = client.chat.completions.create(
         model=deployment_name,
         messages=messages,
@@ -29,7 +28,8 @@ async def get_streaming_chat_completion(client, deployment_name, messages, max_t
         stream=True,
         stream_options={
             "include_usage": True
-        }
+        },
+        extra_body=extra_body
     )
     assistant_message = st.chat_message("assistant")
     full_response = ""
@@ -67,12 +67,14 @@ async def get_streaming_chat_completion(client, deployment_name, messages, max_t
     return ChatMessage(full_response, p_tokens, c_tokens, t_tokens)
 
 # Non-streaming chat completion
-def get_chat_completion(client, deployment_name, messages, max_tokens):
+def get_chat_completion(client, deployment_name, messages, max_tokens, security_context=None):
+    extra_body = {"user_security_context": security_context.to_dict()} if security_context else {}
 
     response = client.chat.completions.create(
         model=deployment_name,
         messages=messages,
-        max_tokens=max_tokens
+        max_tokens=max_tokens,
+        extra_body=extra_body
     )
 
     if response.choices[0].message.content is not None:
@@ -87,3 +89,12 @@ def get_chat_completion(client, deployment_name, messages, max_tokens):
 
         full_response = "Sorry, I was unable to generate a response."
         return ChatMessage(full_response, 0, 0, 0)
+
+# Setup assistant
+def setup_assistant(system_prompt: str = "You are a helpful assistant"):
+    """Setup the assistant with a system prompt."""
+    message = {
+        "role": "system",
+        "content": system_prompt
+    }
+    return message

@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  chatbot-dev:
+    build: 
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - AZURE_OPENAI_API_VERSION=${AZURE_OPENAI_API_VERSION}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+    env_file:
+      - ../.variables
+    volumes:
+      # Development: mount source code for hot reloading
+      - ../src:/app/src
+      - ../app.py:/app/app.py
+      - ../.sp1_secret:/app/.sp1_secret:ro
+      - ../.sp2_secret:/app/.sp2_secret:ro
+    command: ["streamlit", "run", "app.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.runOnSave=true"]
+    restart: unless-stopped

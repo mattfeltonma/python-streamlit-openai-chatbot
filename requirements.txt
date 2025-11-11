@@ -5,3 +5,4 @@ azure-identity>=1.12.0
 pillow>=10.4.0
 python-dotenv
 asyncio
+pydantic

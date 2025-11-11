@@ -19,12 +19,12 @@ def setup_logger():
 
     streamlit.logger._loggers = {}
 
-    # Then set our logger in a normal way
+    # Setup the logger in the way I usually do with my crap apps
     logging.basicConfig(
         level=logging.INFO,
         format="%(levelname)s %(asctime)s %(name)s:%(message)s",
         force=True,
-    )  # Change these settings for your own purpose, but keep force=True at least.
+    ) 
 
     streamlit_handler = logging.getLogger("streamlit")
     streamlit_handler.setLevel(logging.ERROR)

@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  chatbot:
+    build: 
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      # You can override these in .env file or set them here
+      - AZURE_OPENAI_API_VERSION=${AZURE_OPENAI_API_VERSION}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+    env_file:
+      - ../.variables  # Load environment variables from file
+    volumes:
+      # Mount secrets (you might want to use Docker secrets instead)
+      - ../.sp1_secret:/app/.sp1_secret:ro
+      - ../.sp2_secret:/app/.sp2_secret:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

@@ -3,7 +3,6 @@
 venv
 __pycache__
 
-# App specific
-.sp1_secret
-.sp2_secret
-.variables
+# Environmental and secret files
+.env.local
+.env.local.secrets

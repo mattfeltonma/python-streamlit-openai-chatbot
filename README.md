@@ -28,6 +28,48 @@ Features include:
 2. Create three files named .sp1_secret, .sp2_secret, and .variables. Sample files have been provided for you in this repository. If you have a single service principal you can put those credentials in both secret files.
 3. Create a [Python virtual environment](https://docs.python.org/3/library/venv.html) and activate the virtual environment. You should be running Python 3.12 or later.
 4. Install the [necessary libraries](https://packaging.python.org/en/latest/tutorials/installing-packages/).
-5. Start the streamlit application.
-   `streamlit run ChatBot.py --server.port 8080`
+5. Start the streamlit application using one of these methods:
+   - **Local development**: `python run_app.py`
+   - **Direct streamlit**: `streamlit run app.py --server.port 8080`
+   - **Docker (development)**: `cd docker && docker-compose -f docker-compose.dev.yml up --build`
+   - **Docker (production)**: `cd docker && docker-compose -f docker-compose.prod.yml up -d`
+   - **Docker (manual build)**: `docker build -f docker/Dockerfile -t chatbot . && docker run -p 8080:8080 chatbot`
 6. Party on dudes!
+
+## Project Structure
+
+The project follows a clean, Docker-friendly structure:
+
+```
+├── app.py                     # Main Streamlit application entry point
+├── run_app.py                 # Local development script
+├── requirements.txt           # Python dependencies
+├── docker/                    # Docker configuration directory
+│   ├── Dockerfile             # Container configuration
+│   ├── docker-compose.yml     # Basic development setup
+│   ├── docker-compose.dev.yml # Development with hot reloading
+│   ├── docker-compose.prod.yml# Production with secrets
+│   ├── .dockerignore          # Docker build exclusions
+│   └── README.md              # Docker-specific documentation
+├── config files/              # Environment and secrets
+│   ├── .variables
+│   ├── .sp1_secret
+│   └── .sp2_secret
+└── src/
+    ├── core/
+    │   ├── auth.py           # Authentication functionality
+    │   └── chat.py           # Chat and OpenAI integration
+    ├── utils/
+    │   ├── image_processor.py # Image processing utilities
+    │   └── logger.py         # Logging configuration
+    └── ui/
+        ├── sidebar.py        # Sidebar UI components
+        └── components.py     # Reusable UI components
+```
+
+### Docker Benefits:
+- **Organized**: All Docker files in dedicated directory
+- **Multiple environments**: Dev, staging, production configurations
+- **Security**: Proper secrets management and non-root execution
+- **Development**: Hot reloading support for faster iteration
+- **Production**: Health checks, logging, and restart policies

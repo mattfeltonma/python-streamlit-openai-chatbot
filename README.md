@@ -77,46 +77,6 @@ streamlit run app.py --server.port 8080
 ### 4. Access the Application
 Open your browser to `http://localhost:8080` and authenticate with your Entra ID credentials.
 
-## Project Structure
-
-The project follows a clean, modular architecture designed for enterprise use:
-
-```
-📦 python-streamlit-openai-chatbot
-├── 📄 app.py                          # Main Streamlit application entry point
-├── 📄 run_app.py                      # Local development launcher
-├── 📄 requirements.txt                # Python dependencies
-├── 📁 assets/                         # Static assets (images, etc.)
-├── 📁 config/                         # Configuration and environment files
-│   ├── 📄 .env.local                  # Application settings
-│   ├── 📄 .env.local.secrets          # Sensitive credentials
-│   └── 📁 sample_files/               # Example configuration templates
-├── 📁 docker/                         # Docker configuration
-│   ├── 📄 Dockerfile                  # Container configuration  
-│   ├── 📄 docker-compose.yml          # Basic development setup
-│   ├── 📄 docker-compose.dev.yml      # Development with hot reloading
-│   ├── 📄 docker-compose.prod.yml     # Production configuration
-│   └── 📄 README.md                   # Docker-specific documentation
-└── 📁 src/                           # Application source code
-    ├── 📁 auth/                       # Authentication & security
-    │   ├── 📄 __init__.py
-    │   ├── 📄 client_auth.py          # Service principal authentication
-    │   ├── 📄 user_auth.py            # Entra ID user authentication
-    │   └── 📄 security_context.py     # Security context management
-    ├── 📁 core/                       # Core business logic
-    │   ├── 📄 __init__.py
-    │   └── 📄 chat.py                 # OpenAI chat functionality
-    ├── 📁 ui/                         # User interface components
-    │   ├── 📄 __init__.py
-    │   ├── 📄 components.py           # Reusable UI components
-    │   ├── 📄 page.py                 # Page layout management
-    │   └── 📄 sidebar.py              # Sidebar configuration
-    └── 📁 utils/                      # Utility functions
-        ├── 📄 __init__.py
-        ├── 📄 image_processor.py      # Image handling utilities
-        └── 📄 logger.py               # Logging configuration
-```
-
 ## Architecture Highlights
 
 ### 🔐 **Authentication Flow**

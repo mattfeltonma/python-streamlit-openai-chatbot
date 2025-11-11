@@ -62,21 +62,6 @@ pip install -r requirements.txt
 ### 2. Configure Environment Variables
 Create your configuration files in the `config/` directory:
 
-**config/.env.local** (Application settings):
-```bash
-AZURE_OPENAI_ENDPOINT=https://your-aoai-instance.openai.azure.com/
-AZURE_OPENAI_API_VERSION=2024-06-01
-AZURE_CLIENT_ID=your-app-registration-client-id
-AZURE_TENANT_ID=your-tenant-id
-REDIRECT_URI=http://localhost:8080
-```
-
-**config/.env.local.secrets** (Sensitive credentials):
-```bash
-AZURE_CLIENT_SECRET=your-client-secret
-AZURE_CLIENT_SECRET_SP=your-service-principal-secret
-```
-
 > 📝 **Note**: Sample files are provided in `config/sample_files/` for reference.
 
 ### 3. Run the Application
@@ -88,13 +73,6 @@ python run_app.py
 
 # Direct Streamlit
 streamlit run app.py --server.port 8080
-
-# Docker development (with hot reload)
-cd docker && docker-compose -f docker-compose.dev.yml up --build
-
-# Docker production
-cd docker && docker-compose -f docker-compose.prod.yml up -d
-```
 
 ### 4. Access the Application
 Open your browser to `http://localhost:8080` and authenticate with your Entra ID credentials.
